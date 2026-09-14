@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Memories</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="hero">
+    <div class="hero-content">
+        <p class="eyebrow">A special collection of memories</p>
+        <h1>Happy Birthday <span>With Love</span></h1>
+        <p>Watch the complete birthday movies and relive every beautiful moment.</p>
+        <a class="button" href="#movies">Watch Memories</a>
+        <a class="admin-link" href="{{ url_for('login') }}">Admin Login</a>
+    </div>
+</header>
+
+<main class="container" id="movies">
+    <section class="heading">
+        <p class="eyebrow">Birthday movie collection</p>
+        <h2>Full Birthday Movies</h2>
+        <p>Press the play button. If a separate song is uploaded, use “Play Movie + Song”.</p>
+    </section>
+
+    {% if memories %}
+    <div class="movie-grid">
+        {% for memory in memories %}
+        <article class="movie-card">
+            {% if memory["cover_filename"] %}
+                <img class="cover" src="{{ url_for('uploaded_file', filename=memory['cover_filename']) }}" alt="{{ memory['title'] }}">
+            {% else %}
+                <div class="cover placeholder">🎂</div>
+            {% endif %}
+
+            <div class="movie-body">
+                <span class="tag">{{ memory["year"] }}</span>
+                <h3>{{ memory["title"] }}</h3>
+
+                <video class="movie" controls playsinline preload="metadata">
+                    <source src="{{ url_for('uploaded_file', filename=memory['movie_filename']) }}">
+                    Your browser does not support video playback.
+                </video>
+
+                {% if memory["song_filename"] %}
+                <audio class="song" controls loop>
+                    <source src="{{ url_for('uploaded_file', filename=memory['song_filename']) }}">
+                </audio>
+                <button class="button small sync-button" type="button">
+                    ▶ Play Movie + Song
+                </button>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+        <h3>No movies uploaded yet</h3>
+        <p>Login as admin to upload a complete birthday movie.</p>
+    </div>
+    {% endif %}
+</main>
+
+<footer>Made with love • Birthday Memories</footer>
+
+<script>
+document.querySelectorAll(".sync-button").forEach(function(button) {
+    button.addEventListener("click", function() {
+        const card = button.closest(".movie-card");
+        const video = card.querySelector("video");
+        const audio = card.querySelector("audio");
+
+        document.querySelectorAll("video").forEach(function(item) {
+            if (item !== video) item.pause();
+        });
+
+        document.querySelectorAll("audio").forEach(function(item) {
+            if (item !== audio) item.pause();
+        });
+
+        video.play();
+        audio.play();
+    });
+});
+
+document.querySelectorAll(".movie").forEach(function(video) {
+    video.addEventListener("play", function() {
+        const audio = video.closest(".movie-card").querySelector("audio");
+        if (audio) audio.play().catch(function() {});
+    });
+
+    video.addEventListener("pause", function() {
+        const audio = video.closest(".movie-card").querySelector("audio");
+        if (audio) audio.pause();
+    });
+});
+</script>
+</body>
+</html>

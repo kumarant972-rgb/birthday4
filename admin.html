@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="admin-header">
+    <div>
+        <p class="eyebrow">Content management</p>
+        <h1>Birthday Movie Admin</h1>
+    </div>
+    <div class="actions">
+        <a class="button secondary" href="{{ url_for('index') }}">View Website</a>
+        <a class="button danger" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</header>
+
+<main class="container admin-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <section class="upload-card">
+        <div class="heading">
+            <p class="eyebrow">Add new content</p>
+            <h2>Upload Complete Birthday Movie</h2>
+            <p>Upload the full movie video. A separate song and cover photo are optional.</p>
+        </div>
+
+        <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-grid">
+                <div>
+                    <label for="year">Year *</label>
+                    <input id="year" name="year" type="text" placeholder="2026" required>
+                </div>
+                <div>
+                    <label for="title">Movie Title</label>
+                    <input id="title" name="title" type="text" placeholder="Our Beautiful Memories">
+                </div>
+            </div>
+
+            <label for="movie">Complete Movie Video *</label>
+            <input id="movie" name="movie" type="file" accept="video/*" required>
+            <small>Recommended: MP4 video</small>
+
+            <label for="song">Separate Background Song</label>
+            <input id="song" name="song" type="file" accept="audio/*">
+
+            <label for="cover">Cover Photo</label>
+            <input id="cover" name="cover" type="file" accept="image/*">
+
+            <button class="button full" type="submit">Upload Birthday Movie</button>
+        </form>
+    </section>
+
+    <section>
+        <div class="heading">
+            <p class="eyebrow">Existing content</p>
+            <h2>Manage Movies</h2>
+        </div>
+
+        <div class="admin-list">
+            {% for memory in memories %}
+            <div class="admin-item">
+                <div>
+                    <span class="tag">{{ memory["year"] }}</span>
+                    <h3>{{ memory["title"] }}</h3>
+                    <p>Movie: {{ memory["movie_filename"] }}</p>
+                    <p>Song: {{ memory["song_filename"] or "Not uploaded" }}</p>
+                </div>
+                <form action="{{ url_for('delete_memory', memory_id=memory['id']) }}" method="POST"
+                      onsubmit="return confirm('Delete this movie?')">
+                    <button class="button danger" type="submit">Delete</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="empty">No movies uploaded yet.</div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+</body>
+</html>
