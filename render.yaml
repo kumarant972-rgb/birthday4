@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: birthday-movie-website
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: BIRTHDAY_ADMIN_PASSWORD
+        sync: false
+      - key: SECRET_KEY
+        sync: false
